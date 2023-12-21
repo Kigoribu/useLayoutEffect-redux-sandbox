@@ -6,8 +6,6 @@ import { Arrow } from "./components/Arrow";
 import { INode, addNode } from "./store/nodeSlice";
 
 function App() {
-  const nodesRef = useRef<HTMLDivElement[]>(null);
-
   const nodes = useAppSelector((state) => state.nodes);
   const dispatch = useAppDispatch();
 
@@ -21,24 +19,11 @@ function App() {
     }
   }, []);
 
-  const addToRefs = (element: any) => {
-    if (element && !nodesRef.current?.includes(element)) {
-      nodesRef.current?.push(element);
-    }
-  };
-
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       {nodes.map((node: INode, i: number) => (
         <Fragment key={i}>
-          <Node
-            ref={() => {
-              addToRefs;
-            }}
-            top={node.top}
-            left={node.left}
-            i={i}
-          />
+          <Node top={node.top} left={node.left} i={i} />
           {i + 1 < nodes.length ? (
             <Arrow start={node.startPoint} end={nodes[i + 1]?.endPoint!} />
           ) : null}

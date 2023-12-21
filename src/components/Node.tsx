@@ -1,6 +1,7 @@
-import { ForwardedRef, forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import { FC, ForwardedRef, forwardRef, memo, useEffect, useLayoutEffect, useRef } from "react";
 import { useAppDispatch } from "../hook";
 import { updateNode } from "../store/nodeSlice";
+import { getRandomValue } from "../utils/getRandomValue";
 
 interface INodeProps {
   top: number;
@@ -8,27 +9,16 @@ interface INodeProps {
   i: number;
 }
 
-const useForwardRef = <T,>(ref: ForwardedRef<T>, initialValue: any = null) => {
-  const targetRef = useRef<T>(initialValue);
-  useEffect(() => {
-    if (!ref) return;
-    if (typeof ref === "function") {
-      ref(targetRef.current);
-    } else {
-      ref.current = targetRef.current;
-    }
-  }, [ref]);
-  return targetRef;
-};
+const width = getRandomValue(50, 200);
+const height = getRandomValue(50, 200);
 
-export const Node = forwardRef<HTMLDivElement, INodeProps>(({ top, left, i }, ref) => {
-  const myRef = useForwardRef(ref);
-  let elementInfo = undefined;
+export const Node: FC<INodeProps> = memo(function Node({ top, left, i }: any) {
+  const myRef = useRef<HTMLDivElement>(null!);
 
   const dispatch = useAppDispatch();
 
   useLayoutEffect(() => {
-    elementInfo = myRef.current.getBoundingClientRect();
+    let elementInfo = myRef.current.getBoundingClientRect();
     dispatch(
       updateNode({
         id: i,
@@ -90,8 +80,8 @@ export const Node = forwardRef<HTMLDivElement, INodeProps>(({ top, left, i }, re
         cursor: "move",
         backgroundColor: "gray",
         position: "absolute",
-        width: "100px",
-        height: "75px",
+        width: width,
+        height: height,
         top: top,
         left: left,
       }}

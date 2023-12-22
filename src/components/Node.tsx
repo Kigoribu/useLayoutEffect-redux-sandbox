@@ -1,29 +1,23 @@
 import { FC, ForwardedRef, forwardRef, memo, useEffect, useLayoutEffect, useRef } from "react";
-import { useAppDispatch } from "../hook";
-import { updateNode } from "../store/nodeSlice";
+import { useAppDispatch, useAppSelector } from "../hook";
+import { INode, updateNode } from "../store/nodeSlice";
 import { getRandomValue } from "../utils/getRandomValue";
 
 interface INodeProps {
-  top: number;
-  left: number;
-  i: number;
+  node: INode;
 }
 
-const width = getRandomValue(50, 200);
-const height = getRandomValue(50, 200);
-
-export const Node: FC<INodeProps> = memo(function Node({ top, left, i }: any) {
+export const Node: FC<INodeProps> = memo(function Node({ node }) {
   const myRef = useRef<HTMLDivElement>(null!);
 
   const dispatch = useAppDispatch();
 
   useLayoutEffect(() => {
+    //Ставим Arrow на свои места ДО отрисовки с помощью UseLayoutEffect
     let elementInfo = myRef.current.getBoundingClientRect();
     dispatch(
       updateNode({
-        id: i,
-        top: elementInfo.top,
-        left: elementInfo.left,
+        id: node.id,
         endPoint: {
           x: elementInfo.left,
           y: elementInfo.top + elementInfo.height / 2,
@@ -34,25 +28,23 @@ export const Node: FC<INodeProps> = memo(function Node({ top, left, i }: any) {
         },
       })
     );
-    let offsetX: number = left;
-    let offsetY: number = top;
+
+    //Реализация drag`n`drop
+    let offsetX: number = node.left;
+    let offsetY: number = node.top;
     const move = (e: any) => {
+      const top = e.clientX - offsetX;
+      const left = e.clientY - offsetY;
+
+      myRef.current.style.left = `${top}px`;
+      myRef.current.style.top = `${left}px`;
+
       elementInfo = myRef.current.getBoundingClientRect();
-      myRef.current.style.left = `${e.clientX - offsetX}px`;
-      myRef.current.style.top = `${e.clientY - offsetY}px`;
       dispatch(
         updateNode({
-          id: i,
+          id: node.id,
           top: elementInfo.top,
           left: elementInfo.left,
-          endPoint: {
-            x: elementInfo.left,
-            y: elementInfo.top + elementInfo.height / 2,
-          },
-          startPoint: {
-            x: elementInfo.left + elementInfo.width,
-            y: elementInfo.top + elementInfo.height / 2,
-          },
         })
       );
     };
@@ -80,13 +72,13 @@ export const Node: FC<INodeProps> = memo(function Node({ top, left, i }: any) {
         cursor: "move",
         backgroundColor: "gray",
         position: "absolute",
-        width: width,
-        height: height,
-        top: top,
-        left: left,
+        width: node.width,
+        height: node.height,
+        top: node.top,
+        left: node.left,
       }}
     >
-      <p>{i}</p>
+      <p>{node.id}</p>
     </div>
   );
 });

@@ -44,7 +44,7 @@ const nodeSlice = createSlice({
       };
     },
     removeAllNodes: (state: INode[]) => {
-      state = [];
+      state.length = 0;
     },
   },
 });

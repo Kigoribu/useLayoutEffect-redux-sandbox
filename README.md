@@ -8,6 +8,6 @@ It is necessary to create a page with the generation of nodes and connections be
 
 ## Launch
 
-``js
+```javascript
 npm run dev
-``
+```
